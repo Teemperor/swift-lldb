@@ -1,4 +1,4 @@
-//===-- ExpressionSourceCode.cpp --------------------------------*- C++ -*-===//
+//===-- ClangExpressionSourceCode.cpp ---------------------------*- C++ -*-===//
 //
 // Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
 // See https://llvm.org/LICENSE.txt for license information.
@@ -6,7 +6,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "lldb/Expression/ExpressionSourceCode.h"
+#include "ClangExpressionSourceCode.h"
 
 #include <algorithm>
 
@@ -39,7 +39,7 @@
 
 using namespace lldb_private;
 
-const char *ExpressionSourceCode::g_expression_prefix = R"(
+const char *ClangExpressionSourceCode::g_expression_prefix = R"(
 #ifndef NULL
 #define NULL (__null)
 #endif
@@ -292,12 +292,11 @@ static llvm::StringRef getAvailabilityName(const llvm::Triple &triple) {
   return swift::platformString(swift::targetPlatform(lang_options));
 }
 
-bool ExpressionSourceCode::GetText(
-    std::string &text, lldb::LanguageType wrapping_language,
-    uint32_t language_flags, const EvaluateExpressionOptions &options,
-    ExecutionContext &exe_ctx, uint32_t &first_body_line) const {
-  first_body_line = 0;
-
+bool ClangExpressionSourceCode::GetText(std::string &text,
+                                   lldb::LanguageType wrapping_language,
+                                   bool static_method,
+                                   ExecutionContext &exe_ctx,
+                                   bool add_locals) const {
   const char *target_specific_defines = "typedef signed char BOOL;\n";
   std::string module_macros;
 
@@ -534,7 +533,7 @@ bool ExpressionSourceCode::GetText(
   return true;
 }
 
-bool ExpressionSourceCode::GetOriginalBodyBounds(
+bool ClangExpressionSourceCode::GetOriginalBodyBounds(
     std::string transformed_text, lldb::LanguageType wrapping_language,
     size_t &start_loc, size_t &end_loc) {
   const char *start_marker;
